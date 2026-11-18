@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ThemeAwareToaster } from "@/components/providers/ThemeAwareToaster";
 import "./globals.css";
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-base-100 font-sans text-base-content antialiased">
         <Navbar />
         {children}
+        <Footer />
         <ThemeAwareToaster />
       </body>
     </html>
