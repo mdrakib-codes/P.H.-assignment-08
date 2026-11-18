@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { Navbar } from "@/components/layout/Navbar";
 import { ThemeAwareToaster } from "@/components/providers/ThemeAwareToaster";
 import "./globals.css";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen bg-base-100 font-sans text-base-content antialiased">
+        <Navbar />
         {children}
         <ThemeAwareToaster />
       </body>
