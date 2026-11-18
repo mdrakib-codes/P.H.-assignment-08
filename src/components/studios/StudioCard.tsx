@@ -9,12 +9,14 @@ import type { Studio } from "@/types";
 interface StudioCardProps {
   studio: Studio;
   isWishlisted?: boolean;
+  isWishlistPending?: boolean;
   onToggleWishlist?: (studioId: string) => void;
 }
 
 export function StudioCard({
   studio,
   isWishlisted = false,
+  isWishlistPending = false,
   onToggleWishlist,
 }: StudioCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
@@ -44,7 +46,9 @@ export function StudioCard({
         </span>
         <button
           type="button"
-          className="btn btn-circle btn-sm absolute right-4 top-4 border-base-300/70 bg-base-100/90 text-base-content shadow-md backdrop-blur transition hover:border-error/40 hover:bg-base-100 hover:text-error"
+          disabled={isWishlistPending}
+          aria-busy={isWishlistPending}
+          className="btn btn-circle btn-sm absolute right-4 top-4 border-base-300/70 bg-base-100/90 text-base-content shadow-md backdrop-blur transition hover:border-error/40 hover:bg-base-100 hover:text-error disabled:cursor-wait disabled:opacity-70"
           aria-label={
             isWishlisted
               ? `Remove ${studio.title} from wishlist`
