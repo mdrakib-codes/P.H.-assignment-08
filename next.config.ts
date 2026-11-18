@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -11,6 +10,27 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
+  async rewrites() {
+    const serverUrl = process.env.SERVER_URL;
+    if (!serverUrl) {
+      throw new Error("SERVER_URL must be configured for the backend rewrite");
+    }
+
+    return [
+      {
+        source: "/api/server/:path*",
+        destination: `${serverUrl}/api/:path*`,
+      },
+    ];
   },
 };
 
