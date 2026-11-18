@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "studiodark";
+  default: true;
+  color-scheme: dark;
+
+  --color-base-100: #12100e;
+  --color-base-200: #1c1916;
+  --color-base-300: #2e2a25;
+  --color-base-content: #f5f0e8;
+  --color-primary: #f2a93b;
+  --color-primary-content: #1a1205;
+  --color-secondary: #26221e;
+  --color-secondary-content: #f5f0e8;
+  --color-accent: #f2a93b;
+  --color-accent-content: #1a1205;
+  --color-neutral: #26221e;
+  --color-neutral-content: #f5f0e8;
+  --color-success: #6fcf97;
+  --color-success-content: #12100e;
+  --color-info: #7fb2f0;
+  --color-info-content: #12100e;
+  --color-warning: #f2a93b;
+  --color-warning-content: #1a1205;
+  --color-error: #f08a7a;
+  --color-error-content: #1a1205;
+  --studio-muted: #a59e93;
+}
+
+@plugin "daisyui/theme" {
+  name: "studiolight";
+  color-scheme: light;
+
+  --color-base-100: #faf6ef;
+  --color-base-200: #ffffff;
+  --color-base-300: #e4dccd;
+  --color-base-content: #1a1612;
+  --color-primary: #f2a93b;
+  --color-primary-content: #1a1205;
+  --color-secondary: #f1ebdf;
+  --color-secondary-content: #1a1612;
+  --color-accent: #a15f00;
+  --color-accent-content: #ffffff;
+  --color-neutral: #f1ebdf;
+  --color-neutral-content: #1a1612;
+  --color-success: #1e8a4c;
+  --color-success-content: #ffffff;
+  --color-info: #1f5fad;
+  --color-info-content: #ffffff;
+  --color-warning: #f2a93b;
+  --color-warning-content: #1a1205;
+  --color-error: #c2392b;
+  --color-error-content: #ffffff;
+  --studio-muted: #6b6358;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@utility text-muted {
+  color: var(--studio-muted);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-space-grotesk), sans-serif;
 }
