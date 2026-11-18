@@ -5,12 +5,19 @@ import Link from "next/link";
 import { StudioCard } from "@/components/studios/StudioCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StudioCardSkeleton } from "@/components/ui/Skeletons";
+import { useWishlist } from "@/hooks/useWishlist";
 import { api } from "@/lib/api";
 import type { Studio } from "@/types";
 
 const FEATURED_STUDIO_COUNT = 6;
 
 export function FeaturedStudios() {
+  const {
+    isLoading: isWishlistLoading,
+    isPending,
+    isSaved,
+    toggle,
+  } = useWishlist();
   const [studios, setStudios] = useState<Studio[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -110,7 +117,15 @@ export function FeaturedStudios() {
       ) : (
         <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
           {studios.map((studio) => (
-            <StudioCard key={studio._id} studio={studio} />
+            <StudioCard
+              key={studio._id}
+              studio={studio}
+              isWishlisted={isSaved(studio._id)}
+              isWishlistPending={
+                isWishlistLoading || isPending(studio._id)
+              }
+              onToggleWishlist={toggle}
+            />
           ))}
         </div>
       )}
