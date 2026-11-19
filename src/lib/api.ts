@@ -1,11 +1,19 @@
-import { DEV_USER } from "@/lib/devUser";
-
 export type ApiMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface ApiOptions {
   method?: ApiMethod;
   body?: unknown;
   headers?: HeadersInit;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
 }
 
 function getErrorMessage(data: unknown, fallback: string): string {
@@ -37,12 +45,6 @@ export async function api<T = unknown>(
     headers.set("Content-Type", "application/json");
   }
 
-  if (process.env.NEXT_PUBLIC_DEV_BYPASS_AUTH === "true") {
-    // TODO: Remove these development identity headers when real auth is added.
-    headers.set("x-dev-email", DEV_USER.email);
-    headers.set("x-dev-name", DEV_USER.name);
-  }
-
   const response = await fetch(`/api/server${path}`, {
     method,
     headers,
@@ -61,8 +63,9 @@ export async function api<T = unknown>(
   }
 
   if (!response.ok) {
-    throw new Error(
+    throw new ApiError(
       getErrorMessage(data, response.statusText || "Request failed"),
+      response.status,
     );
   }
 
