@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { TbAperture } from "react-icons/tb";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { authClient } from "@/lib/auth-client";
 
 const navigationLinks = [
   { label: "Home", href: "/" },
@@ -89,8 +91,10 @@ function getInitials(name: string) {
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, isPending } = useCurrentUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const accountMenuRef = useRef<HTMLDetailsElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileCloseButtonRef = useRef<HTMLButtonElement>(null);
@@ -158,10 +162,31 @@ export function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  function showLogoutNotice() {
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
     accountMenuRef.current?.removeAttribute("open");
     setMobileMenuOpen(false);
-    toast.info("Logout will be available when authentication is connected.");
+
+    try {
+      const result = await authClient.signOut();
+      if (result.error) {
+        throw new Error(result.error.message || "Unable to sign out.");
+      }
+
+      toast.success("You have been signed out.");
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to sign out.",
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
   }
 
   return (
@@ -172,7 +197,7 @@ export function Navbar() {
       >
         <Link
           href="/"
-          className="inline-flex shrink-0 items-center gap-2 font-heading text-2xl font-bold tracking-tight"
+          className="inline-flex shrink-0 items-center gap-2 font-heading text-xl font-bold tracking-tight sm:text-2xl"
           aria-label="StudioSpace home"
         >
           <TbAperture aria-hidden="true" className="size-8 text-primary" />
@@ -192,10 +217,10 @@ export function Navbar() {
               className="dropdown dropdown-end"
             >
               <summary
-                className="btn btn-ghost btn-circle avatar cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+                className="btn btn-ghost btn-circle btn-sm avatar cursor-pointer list-none sm:btn-md [&::-webkit-details-marker]:hidden"
                 aria-label="Open account menu"
               >
-                <span className="w-10 overflow-hidden rounded-full bg-primary/15 text-primary ring-2 ring-base-300">
+                <span className="w-8 overflow-hidden rounded-full bg-primary/15 text-primary ring-2 ring-base-300 sm:w-10">
                   {user.image ? (
                     <Image
                       src={user.image}
@@ -205,16 +230,34 @@ export function Navbar() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="grid h-full min-h-10 place-items-center text-sm font-semibold">
+                    <span className="grid h-full min-h-8 place-items-center text-sm font-semibold sm:min-h-10">
                       {getInitials(user.name)}
                     </span>
                   )}
                 </span>
+
               </summary>
-              <div className="dropdown-content z-50 mt-3 w-64 overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl">
-                <div className="border-b border-base-300 px-4 py-3">
-                  <p className="truncate font-semibold">{user.name}</p>
-                  <p className="break-all text-sm text-muted">{user.email}</p>
+              <div className="dropdown-content z-50 mt-3 w-64 max-w-[calc(100vw-4.5rem)] overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl">
+                <div className="flex items-center gap-3 border-b border-base-300 px-4 py-3">
+                  <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/15 text-primary ring-2 ring-base-300">
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt=""
+                        width={40}
+                        height={40}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold">
+                        {getInitials(user.name)}
+                      </span>
+                    )}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{user.name}</p>
+                    <p className="break-all text-sm text-muted">{user.email}</p>
+                  </div>
                 </div>
                 <nav aria-label="Account menu">
                   <ul className="menu p-2">
@@ -231,9 +274,13 @@ export function Navbar() {
                       </li>
                     ))}
                     <li>
-                      <button type="button" onClick={showLogoutNotice}>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                      >
                         <FiLogOut aria-hidden="true" />
-                        Logout
+                        {isLoggingOut ? "Signing out..." : "Logout"}
                       </button>
                     </li>
                   </ul>
@@ -269,11 +316,12 @@ export function Navbar() {
         </div>
       </nav>
 
-      {mobileMenuOpen && (
-        <>
+      {mobileMenuOpen && typeof document !== "undefined"
+        ? createPortal(
+          <>
           <button
             type="button"
-            className="fixed inset-0 z-40 cursor-default bg-neutral/60 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[60] cursor-default bg-neutral/60 backdrop-blur-sm lg:hidden"
             aria-label="Close navigation menu"
             onClick={() => setMobileMenuOpen(false)}
           />
@@ -283,7 +331,7 @@ export function Navbar() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="mobile-navigation-title"
-            className="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,88vw)] flex-col overflow-y-auto border-l border-base-300 bg-base-200 p-5 shadow-2xl lg:hidden"
+            className="fixed inset-y-0 right-0 z-[70] flex w-[min(22rem,88vw)] flex-col overflow-y-auto border-l border-base-300 bg-base-200 p-5 shadow-2xl lg:hidden"
           >
             <div className="mb-8 flex items-center justify-between">
               <p
@@ -317,9 +365,28 @@ export function Navbar() {
             <div className="mt-8 border-t border-base-300 pt-6">
               {!isPending && user ? (
                 <>
-                  <div className="mb-3">
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="break-all text-sm text-muted">{user.email}</p>
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/15 text-primary ring-2 ring-base-300">
+                      {user.image ? (
+                        <Image
+                          src={user.image}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-semibold">
+                          {getInitials(user.name)}
+                        </span>
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-semibold">{user.name}</p>
+                      <p className="break-all text-sm text-muted">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
                   <nav aria-label="Mobile account navigation">
                     <ul className="menu w-full p-0">
@@ -334,9 +401,13 @@ export function Navbar() {
                         </li>
                       ))}
                       <li>
-                        <button type="button" onClick={showLogoutNotice}>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          disabled={isLoggingOut}
+                        >
                           <FiLogOut aria-hidden="true" />
-                          Logout
+                          {isLoggingOut ? "Signing out..." : "Logout"}
                         </button>
                       </li>
                     </ul>
@@ -362,8 +433,10 @@ export function Navbar() {
               ) : null}
             </div>
           </aside>
-        </>
-      )}
+          </>,
+          document.body,
+        )
+        : null}
     </header>
   );
 }

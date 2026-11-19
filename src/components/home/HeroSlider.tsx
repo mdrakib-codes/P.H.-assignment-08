@@ -84,7 +84,7 @@ export function HeroSlider() {
         onSlideChange={(swiper) => {
           setActiveIndex(swiper.realIndex);
         }}
-        className="hero-slider h-[min(800px,calc(100svh_-_4rem))] min-h-[640px]"
+        className="hero-slider h-auto min-h-0 sm:h-[min(800px,calc(100svh_-_4rem))] sm:min-h-[640px]"
         aria-label="StudioSpace featured studios"
         aria-roledescription="carousel"
       >
@@ -183,7 +183,7 @@ export function HeroSlider() {
                 <button
                   key={slide.headline}
                   type="button"
-                  className="grid size-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="grid size-10 sm:size-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   aria-label={`Go to slide ${index + 1}: ${slide.headline}`}
                   aria-current={activeIndex === index ? "true" : undefined}
                   onClick={() => swiperRef.current?.slideToLoop(index)}
@@ -203,7 +203,7 @@ export function HeroSlider() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="btn btn-circle size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
+                className="btn btn-circle size-10 sm:size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
                 aria-label={autoplayPaused ? "Play slideshow" : "Pause slideshow"}
                 aria-pressed={autoplayPaused}
                 onClick={toggleAutoplay}
@@ -216,7 +216,7 @@ export function HeroSlider() {
               </button>
               <button
                 type="button"
-                className="btn btn-circle size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
+                className="btn btn-circle size-10 sm:size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
                 aria-label="Previous slide"
                 onClick={() => swiperRef.current?.slidePrev()}
               >
@@ -224,7 +224,7 @@ export function HeroSlider() {
               </button>
               <button
                 type="button"
-                className="btn btn-circle size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
+                className="btn btn-circle size-10 sm:size-11 border-base-content/25 bg-base-100/75 text-base-content shadow-lg backdrop-blur-md hover:border-primary hover:bg-base-200"
                 aria-label="Next slide"
                 onClick={() => swiperRef.current?.slideNext()}
               >
