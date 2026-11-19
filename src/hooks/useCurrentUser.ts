@@ -1,11 +1,9 @@
 "use client";
 
-import { DEV_USER } from "@/lib/devUser";
+import { useAuthSync } from "@/components/auth/AuthSync";
 
 export function useCurrentUser() {
-  // TODO: Replace this development user with the Better Auth session later.
-  return {
-    user: DEV_USER,
-    isPending: false,
-  };
+  const { user, isPending } = useAuthSync();
+
+  return { user, isPending };
 }

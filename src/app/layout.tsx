@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { AuthSyncProvider } from "@/components/auth/AuthSync";
 import { ThemeAwareToaster } from "@/components/providers/ThemeAwareToaster";
+import { WishlistProvider } from "@/components/providers/WishlistProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -47,10 +50,16 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen bg-base-100 font-sans text-base-content antialiased">
-        <Navbar />
-        {children}
-        <Footer />
-        <ThemeAwareToaster />
+        <AuthSyncProvider>
+          <WishlistProvider>
+            <Suspense fallback={<div className="min-h-16" aria-hidden="true" />}>
+              <Navbar />
+            </Suspense>
+            {children}
+            <Footer />
+            <ThemeAwareToaster />
+          </WishlistProvider>
+        </AuthSyncProvider>
       </body>
     </html>
   );
